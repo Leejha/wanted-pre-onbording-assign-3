@@ -1,25 +1,34 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { getIssues } from 'libs/apis/getIssues';
+import GlobalStyles from 'libs/styles/globalStyles';
+import theme from 'libs/styles/theme';
+import React, { createContext, useEffect, useState } from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import { ThemeProvider } from 'styled-components';
+import { Issue } from 'types/issue';
+import Routing from './routes/Routing';
+
+export const issuesContext = createContext<Issue[]>([]);
 
 function App() {
+  const [issues, setIssues] = useState<Issue[]>([]);
+
+  useEffect(() => {
+    const loadIssues = async () => {
+      const issues = await getIssues();
+      setIssues(issues);
+    };
+    loadIssues();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <issuesContext.Provider value={issues}>
+      <BrowserRouter>
+        <ThemeProvider theme={theme}>
+          <GlobalStyles />
+          <Routing />
+        </ThemeProvider>
+      </BrowserRouter>
+    </issuesContext.Provider>
   );
 }
 
